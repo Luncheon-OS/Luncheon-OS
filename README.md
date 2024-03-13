@@ -1,4 +1,4 @@
-# ScorchOS
+# luncheonOS
 > *An atomic Steam Deck UI gaming OS using custom software with Valve software.*
 ## Notes
 - This project is very much in development, and is NOT AT ALL ready for use. It'll be a long way until it's ready.
