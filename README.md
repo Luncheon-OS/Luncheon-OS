@@ -1,4 +1,3 @@
-# luncheonOS
 ![](luncheonos_wide.png)
 > *A Steam Deck UI gaming OS using custom software with Valve software.*
 ## Notes
