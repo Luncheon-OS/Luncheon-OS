@@ -1,4 +1,4 @@
-name: Build ScorchOS image
+name: Build luncheonOS image
 
 on:
   workflow_dispatch:
