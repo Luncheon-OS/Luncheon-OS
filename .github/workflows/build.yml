@@ -1,0 +1,27 @@
+name: Build ScorchOS image
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: archlinux
+    
+    steps:
+      - uses: actions/checkout@v3 # Remember: access using $GITHUB_WORKSPACE
+
+      - name: Initialize build environment
+        run: |
+          pacman -Syu archiso
+          mkdir workingdir
+          mkdir builddir
+
+      - name: Build image with `mkarchiso`
+        run: mkarchiso -v -w workingdir -o builddir $GITHUB_WORKSPACE
+          
+      - name: Artifact resulting ISO for one day
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-iso
+          path: path/to/your/iso
+          retention-days: 1
