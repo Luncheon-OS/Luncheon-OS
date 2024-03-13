@@ -8,7 +8,8 @@ jobs:
     runs-on: archlinux
     
     steps:
-      - uses: actions/checkout@v3 # Remember: access using $GITHUB_WORKSPACE
+      - name: Checkout code
+        uses: actions/checkout@v3 # Remember: access using $GITHUB_WORKSPACE
 
       - name: Initialize build environment
         run: |
@@ -20,8 +21,8 @@ jobs:
         run: mkarchiso -v -w workingdir -o builddir $GITHUB_WORKSPACE
           
       - name: Artifact resulting ISO for one day
-      - uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: my-iso
-          path: path/to/your/iso
+          path: builddir
           retention-days: 1
