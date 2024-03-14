@@ -1,0 +1,6 @@
+NAME="luncheonos"
+PRETTY_NAME="luncheonOS"
+ID=luncheonos
+ID_LIKE=arch
+BUILD_ID=rolling
+LOGO=archlinux
