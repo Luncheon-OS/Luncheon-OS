@@ -4,3 +4,4 @@ ID=luncheonos
 ID_LIKE=arch
 BUILD_ID=rolling
 LOGO=archlinux
+ANSI_COLOR="38;5;208"
