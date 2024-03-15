@@ -1,7 +1,9 @@
 #!/bin/python3
 import subprocess
 
-def runCommand(command):
+def runCommand(command, captureStdout=False):
+    if captureStdout == True:
+        return subprocess.run(str(command).split(' '), capture_output=True)
     subprocess.run(str(command).split(' '))
 
 def promptForStorageIdentifier(idType):
@@ -16,18 +18,60 @@ def promptForStorageIdentifier(idType):
         return None
 
 def useWholeDisk():
-    promptForStorageIdentifier('disk')
+    print()
 
 def usePartition():
-    promptForStorageIdentifier('partition')
+    return promptForStorageIdentifier('partition')
+
+def getEFIpartitionName():
+    return promptForStorageIdentifier('EFI partition')
+
+def partitionWholeDisk(id):
+    parted = None
+
+
+    print(':: Checking if disk ID is valid...')
+    if id not in runCommand(f'find /dev | grep {id}', True).stdout:
+        print('✗ Invalid disk identifier.')
+
+    try:
+        print(':: Partitioning disk...')
+        parted = runCommand(f'parted /dev/{id} mklabel gpt mkpart "EFI partition" fat32 0% 1024MB set 1 esp on mkpart "Luncheon root" primary btrfs 1024MB 100%', True)
+        parted.check_returncode()
+    except:
+        print(f'✗ Failed to create the partitions. `parted` stderr+out data:\n{'stderr: ' + parted.stderr + 'stdout: ' + parted.stdout}')
+        return None
+    
+def mountWholeDisk():
+    mount1 = None
+    mount2 = None
+
+    try:
+        print(':: Mounting rootfs...')
+        mount1 = runCommand(f'mount /dev/{id}2 /mnt')
+        mount1.check_returncode()
+    except:
+        print(f'✗ Failed to mount rootfs. `mount` stderr+out data:\n{'stderr: ' + mount1.stderr + 'stdout: ' + mount1.stdout}')   
+        return None
+    
+    try:
+        print(':: Mounting ESP...')
+        mount2 = runCommand(f'mount -m /dev/{id}1 /mnt/boot')
+        mount2.check_returncode()
+    except:
+        print(f'✗ Failed to mount rootfs. `mount` stderr+out data:\n{'stderr: ' + mount2.stderr + 'stdout: ' + mount2.stdout}')   
+        return None
 
 def main():
     while True:
         prompt = input('==> Do you want to use a _d_isk or a _p_artition? [d/p] ')
         if prompt == 'd':
             useWholeDisk()
+
         elif prompt == 'p':
-            usePartition()
+            #usePartition()
+            #getEFIpartitionName()
+            print('✗ Not supported yet.')
         else:
             print('✗ Invalid input. Please, try again.')
 
