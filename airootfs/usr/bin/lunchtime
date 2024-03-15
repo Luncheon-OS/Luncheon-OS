@@ -1,0 +1,34 @@
+#!/bin/python3
+import subprocess
+
+def runCommand(command):
+    subprocess.run(str(command).split(' '))
+
+def promptForStorageIdentifier(idType):
+    runCommand('lsblk')
+
+    id = input(f'==> Enter {idType} identifier: ')
+    prompt = input(f'==> Really target {idType} ID {id}? All data will be __LOST!__ [y/n] ')
+
+    if prompt == 'y':
+        return id
+    else:
+        return None
+
+def useWholeDisk():
+    promptForStorageIdentifier('disk')
+
+def usePartition():
+    promptForStorageIdentifier('partition')
+
+def main():
+    while True:
+        prompt = input('==> Do you want to use a _d_isk or a _p_artition? [d/p] ')
+        if prompt == 'd':
+            useWholeDisk()
+        elif prompt == 'p':
+            usePartition()
+        else:
+            print('✗ Invalid input. Please, try again.')
+
+main()

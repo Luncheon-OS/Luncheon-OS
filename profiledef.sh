@@ -14,4 +14,5 @@ airootfs_image_type="squashfs"
 airootfs_image_tool_options=('-zlzma,109' -E 'ztailpacking,fragments,dedupe')
 file_permissions=(
   ["/etc/shadow"]="0:0:400"
+  ["/usr/bin/lunchtime"]="7:5:755"
 )
