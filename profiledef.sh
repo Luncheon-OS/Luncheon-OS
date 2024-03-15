@@ -1,7 +1,7 @@
-iso_name="luncheonos"
-iso_label="luncheonOS"
-iso_publisher="The luncheonOS Project <https://luncheonos.github.io>"
-iso_application="luncheonOSS"
+iso_name="Luncheon OS"
+iso_label="Luncheon OS"
+iso_publisher="The Luncheon OS Project <https://luncheonos.github.io>"
+iso_application="Luncheon OS"
 iso_version="1"
 install_dir="arch"
 buildmodes=('iso')
