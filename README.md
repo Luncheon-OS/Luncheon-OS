@@ -27,7 +27,7 @@ Or with Docker:
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo docker pull archlinux:latest
-sudo docker run -it --privileged -v {absolute path to where you cloned the repo}:/los luncheon-os-building archlinux
+sudo docker run -it --privileged -v {absolute path to where you cloned the repo}:/los --name luncheon-os-building archlinux
 ```
 ```bash
 pacman -Syu archiso
