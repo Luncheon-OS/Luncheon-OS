@@ -11,28 +11,29 @@ Ensure that you have an Arch Linux installation (up-to-date) and Podman or Docke
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo podman pull archlinux:latest
-sudo podman run -it --privileged -v {absolute path to where you cloned the repo}:/los luncheon-os-building archlinux
+sudo podman run -it --privileged -v {path to cloned repo}:/los --name luncheon-os-building archlinux
 ```
-```bash
-pacman -Syu archiso
-mkarchiso -v -w /tmp -o /los /los
-exit
-```
-Go to where you cloned the Git repo and the ISO should be there.
-When you're done, `sudo podman rm luncheon-os-building`/.
-
----
-
 Or with Docker:
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo docker pull archlinux:latest
-sudo docker run -it --privileged -v {absolute path to where you cloned the repo}:/los --name luncheon-os-building archlinux
+sudo docker run -it --privileged -v {path to cloned repo}:/los --name luncheon-os-building archlinux
 ```
+In the container:
 ```bash
 pacman -Syu archiso
 mkarchiso -v -w /tmp -o /los /los
 exit
 ```
 Go to where you cloned the Git repo and the ISO should be there.
-When you're done, `sudo docker rm luncheon-os-building`/.
+When you're done, `sudo {podman/docker} rm luncheon-os-building`/.  
+
+---
+We use this modded `_run_mksquashfs()` function for building the images (we replace the stock one with this one):  
+```bash
+_run_mksquashfs() {
+    image_path="${isofs_dir}/${install_dir}/${arch}/airootfs.sfs"
+    rm -f -- "${image_path}"
+    mksquashfs "${pacstrap_dir}" "${image_path}" -b 1048576 -comp xz -Xdict-size 100%
+}
+```

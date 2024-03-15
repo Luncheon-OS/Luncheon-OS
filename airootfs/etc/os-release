@@ -5,4 +5,3 @@ ID_LIKE=arch
 VERSION="1"
 BUILD_ID=rolling
 LOGO=archlinux
-ANSI_COLOR="38;5;208"
