@@ -1,5 +1,9 @@
 Thanks for choosing Luncheon OS!
 
-To install, run command `lunchtime`.
-`archinstall` is also provided if you want to install Arch.....?
- 
+This install medium may be used in three ways:
+1. To actually install the OS: `lunchtime`
+2. To install Arch for some reason: `archinstall` or install traditionally
+3. Repair an existing Linux OS
+
+If you're coming from Windows, congratulations! The installer is straight-forward and simple, so don't worry.
+

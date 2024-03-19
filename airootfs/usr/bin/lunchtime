@@ -1,78 +1,84 @@
-#!/bin/python3
-import subprocess
+#!/usr/bin/perl
+use strict;
+use warnings;
 
-def runCommand(command, captureStdout=False):
-    if captureStdout == True:
-        return subprocess.run(str(command).split(' '), capture_output=True)
-    subprocess.run(str(command).split(' '))
+system "clear";
 
-def promptForStorageIdentifier(idType):
-    runCommand('lsblk')
+print "--== Luncheon OS Installer ==--\n";
+print "/_\\ Whole-disk support only, currently.\n";
 
-    id = input(f'==> Enter {idType} identifier: ')
-    prompt = input(f'==> Really target {idType} ID {id}? All data will be __LOST!__ [y/n] ')
+print `lsblk`;
+print "==> Enter your disk's device node code: ";
+my $dnCode = <>;
+chomp $dnCode;
 
-    if prompt == 'y':
-        return id
-    else:
-        return None
+print "==> /_\\ Really proceed? This will erase YOUR WHOLE DISK. [y/n] ";
+my $confirm = <>;
+chomp $confirm;
+exit 1 unless $confirm eq "y";
 
-def useWholeDisk():
-    print()
+print ":: Partitioning disk...\n";
+my $parted_command = "parted /dev/$dnCode --script mklabel gpt mkpart 'EFI' fat32 0% 512MiB set 1 esp on mkpart 'luncheon-os' ext4 512MiB 100%";
+my $result = system $parted_command;
+if ($result) {
+    die "(X) Failed to partition disk...\n(X) Process killed";
+}
 
-def usePartition():
-    return promptForStorageIdentifier('partition')
+print ":: Formatting partitions...\n";
+my $dnCodeSeparator = "";
+if ($dnCode =~ m/nvme/) {
+    $dnCodeSeparator = "p";
+}
+$result = system "mkfs.fat -F 32 /dev/${dnCode}${dnCodeSeparator}1";
+if ($result) {
+    die "(X) Failed to format EFI partition...\n(X) Process killed";
+}
+$result = system "mkfs.ext4 /dev/${dnCode}${dnCodeSeparator}2";
+if ($result) {
+    die "(X) Failed to format Luncheon OS partition...\n(X) Process killed";
+}
 
-def getEFIpartitionName():
-    return promptForStorageIdentifier('EFI partition')
+print ":: Mounting partitions...\n";
+$result = system "mount /dev/${dnCode}${dnCodeSeparator}2 /mnt";
+if ($result) {
+    die "(X) Failed to mount main partition...\n(X) Process killed";
+}
+$result = system "mount -m /dev/${dnCode}${dnCodeSeparator}1 /mnt/boot";
+if ($result) {
+    die "(X) Failed to mount EFI partition...\n(X) Process killed";
+}
 
-def partitionWholeDisk(id):
-    parted = None
+print ":: Initializing new public Pacman keyring and populating...\n";
+$result = system "pacman-key --init; pacman-key --populate archlinux";
+if ($result) {
+    die "(X) Failed to public Pacman keyring and/or populate...\n(X) Process killed";
+}
 
+print ":: Installing base system and Luncheon OS systems...\n";
+$result = system "pacstrap /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo";
+if ($result) {
+    die "(X) Failed to install systems...\n(X) Process killed";
+}
 
-    print(':: Checking if disk ID is valid...')
-    if id not in runCommand(f'find /dev | grep {id}', True).stdout:
-        print('✗ Invalid disk identifier.')
+print ":: Generating filesystem table...\n";
+$result = system "genfstab -U /mnt >> /mnt/etc/fstab";
+if ($result) {
+    die "(X) Failed to generate filesystem table...\n(X) Process killed";
+}
 
-    try:
-        print(':: Partitioning disk...')
-        parted = runCommand(f'parted /dev/{id} mklabel gpt mkpart "EFI partition" fat32 0% 1024MB set 1 esp on mkpart "Luncheon root" primary btrfs 1024MB 100%', True)
-        parted.check_returncode()
-    except:
-        print(f'✗ Failed to create the partitions. `parted` stderr+out data:\n{'stderr: ' + parted.stderr + 'stdout: ' + parted.stdout}')
-        return None
-    
-def mountWholeDisk():
-    mount1 = None
-    mount2 = None
+print ":: Changing root into new system...\n";
+if (fork) {
+    wait;
+} else {
+    chroot "/mnt" or die "(X) Failed to change root into new root...\n(X) Process killed";
+    print "[DBG] This is where it would do chrooted setup stuff.\n";
+    exit;
+}
 
-    try:
-        print(':: Mounting rootfs...')
-        mount1 = runCommand(f'mount /dev/{id}2 /mnt')
-        mount1.check_returncode()
-    except:
-        print(f'✗ Failed to mount rootfs. `mount` stderr+out data:\n{'stderr: ' + mount1.stderr + 'stdout: ' + mount1.stdout}')   
-        return None
-    
-    try:
-        print(':: Mounting ESP...')
-        mount2 = runCommand(f'mount -m /dev/{id}1 /mnt/boot')
-        mount2.check_returncode()
-    except:
-        print(f'✗ Failed to mount rootfs. `mount` stderr+out data:\n{'stderr: ' + mount2.stderr + 'stdout: ' + mount2.stdout}')   
-        return None
+print ":: Configuring system...\n";
+print "[DBG] This is where it would configure the system.\n";
 
-def main():
-    while True:
-        prompt = input('==> Do you want to use a _d_isk or a _p_artition? [d/p] ')
-        if prompt == 'd':
-            useWholeDisk()
+print ":: Installing GRUB bootloader...\n";
+print "[DBG] This is where it would install GRUB.\n";
 
-        elif prompt == 'p':
-            #usePartition()
-            #getEFIpartitionName()
-            print('✗ Not supported yet.')
-        else:
-            print('✗ Invalid input. Please, try again.')
-
-main()
+print "[SUCCESS] Install successful! Reboot to enter Luncheon OS.\n";
