@@ -33,7 +33,7 @@ _run_mksquashfs() {
 }
 ```
 We have to modify this because for some reason the stock function does not work. Hopefully, it will be fixed soon.  
-Exit Neovim with `Escape, :wq`.
+Exit Neovim with `Escape`, type `:wq` then Enter.
 ```bash
 mkarchiso -v -w /tmp -o /los /los
 exit
