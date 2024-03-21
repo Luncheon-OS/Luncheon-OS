@@ -1,7 +1,8 @@
-:#!/usr/bin/perl
+#!/usr/bin/perl
 use strict;
 use warnings;
 
+# Clear the terminal screen
 system "clear";
 
 print "--== Luncheon OS Installer ==--\n";

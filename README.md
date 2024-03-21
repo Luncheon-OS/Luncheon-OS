@@ -13,6 +13,12 @@ git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo podman pull archlinux:latest
 sudo podman run -it --privileged -v {path to cloned repo}:/los --name los-build archlinux
 ```
+Or if you have a preserved container you can run it with these commands:
+```bash
+sudo podman start los-build
+sudo podman exec -it los-build /bin/bash
+```
+
 Or with Docker:
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
