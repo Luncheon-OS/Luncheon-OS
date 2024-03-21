@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+:#!/usr/bin/perl
 use strict;
 use warnings;
 
@@ -17,22 +17,35 @@ my $confirm = <>;
 chomp $confirm;
 exit 1 unless $confirm eq "y";
 
+print "==> Enter your name: ";
+my $name = <>;
+chomp $name;
+print "Hello, and welcome to Luncheon OS, $name!\n";
+
+print "==> Enter a username for your new user: ";
+my $username = <>;
+chomp $username;
+
+print "(i) For security reasons, your password will be entered near the end.\n";
+
+print "/_\\ This is your FINAL chance before your data goes to get the milk. PROCEED? [y/n] ";
+$confirm = <>;
+chomp $confirm;
+exit 1 unless $confirm eq "y";
+
 print ":: Partitioning disk...\n";
 my $parted_command = "parted /dev/$dnCode --script mklabel gpt mkpart 'EFI' fat32 0% 512MiB set 1 esp on mkpart 'luncheon-os' ext4 512MiB 100%";
 my $result = system $parted_command;
-if ($result) {
-    die "(X) Failed to partition disk...\n(X) Process killed";
-}
+die "(X) Failed to partition disk...\n(X) Process killed" if $result;
 
 print ":: Formatting partitions...\n";
 my $dnCodeSeparator = "";
 if ($dnCode =~ m/nvme/) {
     $dnCodeSeparator = "p";
 }
-$result = system "mkfs.fat -F 32 /dev/${dnCode}${dnCodeSeparator}1";
-if ($result) {
-    die "(X) Failed to format EFI partition...\n(X) Process killed";
-}
+
+$result = system "mkfs.fat -F 32 -- /dev/${dnCode}${dnCodeSeparator}1";
+die "(X) Failed to format EFI partition...\n(X) Process killed" if $result;
 $result = system "mkfs.ext4 /dev/${dnCode}${dnCodeSeparator}2";
 if ($result) {
     die "(X) Failed to format Luncheon OS partition...\n(X) Process killed";
@@ -43,7 +56,7 @@ $result = system "mount /dev/${dnCode}${dnCodeSeparator}2 /mnt";
 if ($result) {
     die "(X) Failed to mount main partition...\n(X) Process killed";
 }
-$result = system "mount -m /dev/${dnCode}${dnCodeSeparator}1 /mnt/boot";
+$result = system "mount -m -- /dev/${dnCode}${dnCodeSeparator}1 /mnt/boot";
 if ($result) {
     die "(X) Failed to mount EFI partition...\n(X) Process killed";
 }
@@ -54,31 +67,107 @@ if ($result) {
     die "(X) Failed to public Pacman keyring and/or populate...\n(X) Process killed";
 }
 
-print ":: Installing base system and Luncheon OS systems...\n";
-$result = system "pacstrap /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo";
+print ":: Installing base system...\n";
+$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager";
 if ($result) {
-    die "(X) Failed to install systems...\n(X) Process killed";
+    die "(X) Failed to install base system...\n(X) Process killed";
 }
+print "/_\\ Must install voooooooooooooooooolkan drivers\n";
+print "/_\\ Please choose your 32-bit Vulkan drivers.\n";
+print "/_\\ Integrated GPUs (which is a GPU baked-into your processor, you almost definitely have an iGPU) are also supported.\n";
+
+my @gpus = ("AMD/Intel (type amdin)", "NVIDIA (type nvid)");
+print "(i) Available types:\n";
+foreach (@gpus) {
+    print "(i) $_\n";
+}
+print "==> Enter your GPU type: ";
+my $gpu = <>;
+$gpu = "lib32-mesa" if $gpu eq "amdin";
+$gpu = "lib32-nvidia-utils" if $gpu eq "nvid";
+chomp $gpu;
+
+print ":: Installing Vulkan drivers...\n";
+$result = `pacstrap /mnt $gpu`;
+die "(X) Failed to install Vulkan drivers...\n(X) Process killed" if $result;
+
+print ":: Installing Valve software...\n";
+$result = system "pacstrap /mnt steam gamescope";
+die "(X) Failed to install Valve software...\n(X) Process killed" if $result;
 
 print ":: Generating filesystem table...\n";
 $result = system "genfstab -U /mnt >> /mnt/etc/fstab";
-if ($result) {
-    die "(X) Failed to generate filesystem table...\n(X) Process killed";
-}
+die "(X) Failed to generate filesystem table...\n(X) Process killed" if $result;
 
-print ":: Changing root into new system...\n";
+print ":: Fixing DNS resolving...\n";
+$result = `ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf`;
+die "(X) Failed to fix DNS resolving...\n(X) Process killed" if $result;
+
+print ":: Configuring your new install!\n";
 if (fork) {
     wait;
 } else {
-    chroot "/mnt" or die "(X) Failed to change root into new root...\n(X) Process killed";
-    print "[DBG] This is where it would do chrooted setup stuff.\n";
+    chroot "/mnt";
+
+    $result = system "useradd -m -c $name -G wheel -s /bin/bash $username";
+    die "(X) Failed to create new user...\n(X) Process killed" if $result;
+
+    require Term::ReadKey;
+    Term::ReadKey::ReadMode("noecho");
+    print "==> Enter new password for $username: ";
+    my $new_password = Term::ReadKey::ReadLine(0);
+    Term::ReadKey::ReadMode("restore");
+    print "\n";
+    $result = system "passwd --stdin $username", "<", \*STDIN, out => "/dev/null", err => "/dev/null";
+    die "(X) Failed to update password...\n(X) Process killed" if $result;
+
+    $result = system "systemctl enable sddm";
+    die "(X) Failed to enable SDDM...\n(X) Process killed" if $result;
+
+    $result = system "systemctl enable NetworkManager";
+    die "(X) Failed to enable NetworkManager...\n(X) Process killed" if $result;
+
+    open "/etc/locale.gen" or die "(X) Failed to open /etc/locale.gen...\n(X) Process killed";
+    truncate "/etc/locale.gen", 0;
+    seek "/etc/locale.gen", 0, 0;
+    print "/etc/locale.gen", "en_US.UTF-8 UTF-8\n";
+    close "/etc/locale.gen";
+
+    $result = `locale-gen`;
+    die "(X) Failed to generate locales...\n(X) Process killed" if $result;
+
+    open "/etc/locale.conf" or die "(X) Failed to open /etc/locale.conf...\n(X) Process killed";
+    truncate "/etc/locale.conf", 0;
+    seek "/etc/locale.conf", 0, 0;
+    print "/etc/locale.conf", "LANG=en_US.UTF-8\n";
+    close "/etc/locale.conf";
+
+    open "/etc/sysctl.d/80-gamecompatibility.conf" or die "(X) Failed to open /etc/sysctl.d/80-gamecompatibility.conf\n(X) Process killed";
+    truncate "/etc/sysctl.d/80-gamecompatibility.conf", 0;
+    seek "/etc/sysctl.d/80-gamecompatibility.conf", 0, 0;
+    print "/etc/sysctl.d/80-gamecompatibility.conf", "/etc/sysctl.d/80-gamecompatibility.conf\n";
+    close "/etc/sysctl.d/80-gamecompatibility.conf";
+
+    print ":: Installing GRUB bootloader...\n";
+    $result = system "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Luncheon_OS /dev/$dnCode";
+    die "(X) Failed to install GRUB...\n(X) Process killed" if $result;
+
+    my $fh = open "/etc/default/grub" or die "(X) Failed to open /etc/default/grub...\n(X) Process killed";
+    while (my $line = <$fh>) {
+        if ($line =~ m/GRUB_CMDLINE_LINUX_DEFAULT/) {
+            print $fh "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash nvidia-drm.modeset=1\"\n";
+        } else {
+            print $fh $line;
+        }
+    }
+    close "/etc/default/grub";
+
+    $result = `grub-mkconfig -o /boot/grub/grub.cfg`;
+    die "(X) Failed to generate GRUB config file...\n(X) Process killed" if $result;
+
     exit;
 }
 
-print ":: Configuring system...\n";
-print "[DBG] This is where it would configure the system.\n";
-
-print ":: Installing GRUB bootloader...\n";
-print "[DBG] This is where it would install GRUB.\n";
+print "/_\\ Hey! HEY! OVER HERE! If you log in and it's just a black screen, please reboot, and press \"Desktop Environment: Plasma (Wayland)\" and select Plasma (X11).\n";
 
 print "[SUCCESS] Install successful! Reboot to enter Luncheon OS.\n";
