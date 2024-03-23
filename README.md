@@ -46,4 +46,8 @@ exit
 ```
 Go to where you cloned the Git repo and the ISO should be there.  
 When you're done, `sudo podman rm los-build` or `sudo docker rm los-build`.  
-You may also preserve this container for future use by instead replacing `exit` with `rm -rf /tmp/*; exit` and not executing the above command.
+You may also preserve this container for future use by instead using the below.
+```bash
+mkarchiso -v -w /tmp -o /los /los
+rm -rf /tmp/*; exit
+```

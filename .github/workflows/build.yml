@@ -23,6 +23,7 @@ jobs:
       - name: Artifact resulting ISO for one day
         uses: actions/upload-artifact@v3
         with:
+        #FIXME: Learn to actually use the GitHub artifaction system
           name: my-iso
           path: builddir
           retention-days: 1

@@ -67,16 +67,15 @@ if ($result) {
     die "(X) Failed to public Pacman keyring and/or populate...\n(X) Process killed";
 }
 
-print "/_\\ Must install voooooooooooooooooolkan drivers\n";
-print "/_\\ Please choose your 32-bit Vulkan drivers.\n";
-print "/_\\ (CPU = processor; GPU = graphics/video card)\n";
+print "/_\\ Must install voooooooooooooooooolkan driver\n";
+print ":: Please choose your 32-bit Vulkan driver.\n";
+print "(i) CPU = processor; GPU = graphics/video card\n";
 my @gpus = ("1. AMD/Intel processor (CPU+GPU)", "2. NVIDIA graphics card (GPU)");
-print "(i) Available types:\n";
+print "(i) Available drivers:\n";
 foreach (@gpus) {
     print "(i) $_\n";
 }
-
-print "==> Enter your GPU type: ";
+print "==> Enter your driver type: ";
 my $gpu = <>;
 $gpu = "lib32-mesa" if $gpu eq "1";
 $gpu = "lib32-nvidia-utils" if $gpu eq "2";
@@ -109,7 +108,7 @@ if (fork) {
 } else {
     chroot "/mnt";
 
-    $result = system "useradd -m -c $name -G wheel -s /bin/bash $username";
+    $result = system "useradd -m -c '$name' -s /bin/bash $username";
     die "(X) Failed to create new user...\n(X) Process killed" if $result;
 
     require Term::ReadKey;
@@ -168,6 +167,6 @@ if (fork) {
     exit;
 }
 
-print "/_\\ Hey! HEY! OVER HERE! If you log in and it's just a black screen, please reboot, and press \"Desktop Environment: Plasma (Wayland)\" and select Plasma (X11).\n";
-
+print "/_\\ Hey! HEY! OVER HERE! If you log in and it's just a black screen, please reboot, and press \"Desktop Environment: Plasma (Wayland)\" and select Plasma (X11).
+This is an issue with Wayland I used to be able to fix, but can't remember how anymore.\n";
 print "[SUCCESS] Install successful! Reboot to enter Luncheon OS.\n";
