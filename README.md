@@ -16,7 +16,7 @@ sudo podman run -it --privileged -v {path to cloned repo}:/los --name los-build 
 Or if you have a preserved container you can run it with these commands:
 ```bash
 sudo podman start los-build
-sudo podman exec -it los-build /bin/bash
+sudo podman attach los-build
 ```
 
 Or with Docker:

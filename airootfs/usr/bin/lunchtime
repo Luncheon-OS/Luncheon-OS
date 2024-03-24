@@ -67,34 +67,32 @@ if ($result) {
     die "(X) Failed to public Pacman keyring and/or populate...\n(X) Process killed";
 }
 
-print "/_\\ Must install voooooooooooooooooolkan drivers\n";
-print "/_\\ Please choose your 32-bit Vulkan drivers.\n";
-print "/_\\ Integrated GPUs (which is a GPU baked-into your processor, you almost definitely have an iGPU) are also supported.\n";
-
-my @gpus = ("AMD/Intel (type amdin)", "NVIDIA (type nvid)");
-
-my $gpu;
-while (1) {
-    print "(i) Available brands:\n";
-    foreach (@gpus) {
-        print "(i) $_\n";
-    }
-    print "==> Enter your GPU brand: ";
-    $gpu = <>;
-    chomp $gpu;
-    my $valid = 0 if $gpu ne "amdin" && $gpu ne "nvid";
-    $valid = 1 if $gpu eq "amdin" || $gpu eq "nvid";
-    $gpu = "lib32-mesa" if $gpu eq "amdin";
-    $gpu = "lib32-nvidia-utils" if $gpu eq "nvid";
-    print "(!) Invalid GPU brand!\n" if $valid == 0;
-    last if $valid == 1;
+print "/_\\ Must install voooooooooooooooooolkan driver\n";
+print ":: Please choose your 32-bit Vulkan driver.\n";
+print "(i) CPU = processor; GPU = graphics/video card\n";
+my @gpus = ("1. AMD/Intel processor (CPU+GPU)", "2. NVIDIA graphics card (GPU)");
+print "(i) Available drivers:\n";
+foreach (@gpus) {
+    print "(i) $_\n";
 }
-
-print ":: Installing base system and packages... This will take a bit.\n";
-$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager steam gamescope $gpu";
+print "==> Enter your driver type: ";
+my $gpu = <>;
+$gpu = "lib32-mesa" if $gpu eq "1";
+$gpu = "lib32-nvidia-utils" if $gpu eq "2";
+chomp $gpu;
+print ":: Installing base system...\n";
+$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager $gpu";
 if ($result) {
-    die "(X) Failed to install base system and/or packages...\n(X) Process killed";
+    die "(X) Failed to install base system...\n(X) Process killed";
 }
+
+print ":: Installing Vulkan drivers...\n";
+$result = `pacstrap /mnt $gpu`;
+die "(X) Failed to install Vulkan drivers...\n(X) Process killed" if $result;
+
+print ":: Installing Valve software...\n";
+$result = system "pacstrap /mnt steam gamescope";
+die "(X) Failed to install Valve software...\n(X) Process killed" if $result;
 
 print ":: Generating filesystem table...\n";
 $result = system "genfstab -U /mnt >> /mnt/etc/fstab";
@@ -171,6 +169,6 @@ if (fork) {
     exit;
 }
 
-print "/_\\ Hey! HEY! OVER HERE! If you log in and it's just a black screen, please reboot/restart, and press \"Desktop Environment: Plasma (Wayland)\" and select Plasma (X11).\n";
-
+print "/_\\ Hey! HEY! OVER HERE! If you log in and it's just a black screen, please reboot, and press \"Desktop Environment: Plasma (Wayland)\" and select Plasma (X11).
+This is an issue with Wayland I used to be able to fix, but can't remember how anymore.\n";
 print "[SUCCESS] Install successful! Reboot to enter Luncheon OS.\n";
