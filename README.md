@@ -13,6 +13,12 @@ git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo podman pull archlinux:latest
 sudo podman run -it --privileged -v {path to cloned repo}:/los --name los-build archlinux
 ```
+Or if you have a preserved container you can run it with these commands:
+```bash
+sudo podman start los-build
+sudo podman exec -it los-build /bin/bash
+```
+
 Or with Docker:
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
@@ -33,11 +39,11 @@ _run_mksquashfs() {
 }
 ```
 We have to modify this because for some reason the stock function does not work. Hopefully, it will be fixed soon.  
-Exit Neovim with `Escape, :wq`.
+Exit Neovim with `Escape`, type `:wq` then Enter.
 ```bash
 mkarchiso -v -w /tmp -o /los /los
 exit
 ```
 Go to where you cloned the Git repo and the ISO should be there.  
 When you're done, `sudo podman rm los-build` or `sudo docker rm los-build`.  
-You may also preserve this container for future use by instead replacing `exit` with `rm -rf /tmp/*; exit` and not executing the above command.
+You may also preserve this container for future use by instead replacing `exit` with `rm -rf /tmp/*; exit` and not executing the above `[podman/docker] rm` command.
