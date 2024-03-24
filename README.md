@@ -38,7 +38,7 @@ _run_mksquashfs() {
     mksquashfs "${pacstrap_dir}" "${image_path}" -b 1048576 -comp xz -Xdict-size 100%
 }
 ```
-We have to modify this because for some reason the stock function does not work. Hopefully, it will be fixed soon.  
+We have to modify this because for some reason the stock function does not work. Hopefully, it will be fixed soon. (If `mkarchiso` gets updated on your build container, you will have to replace the function again.) 
 Exit Neovim with `Escape`, type `:wq` then Enter.
 ```bash
 mkarchiso -v -w /tmp -o /los /los

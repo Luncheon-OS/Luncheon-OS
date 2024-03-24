@@ -77,22 +77,14 @@ foreach (@gpus) {
 }
 print "==> Enter your driver type: ";
 my $gpu = <>;
+chomp $gpu;
 $gpu = "lib32-mesa" if $gpu eq "1";
 $gpu = "lib32-nvidia-utils" if $gpu eq "2";
-chomp $gpu;
-print ":: Installing base system...\n";
-$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager $gpu";
+print ":: Installing base system. This will take a bit; installing roughly 757 packages (bundles of code)...\n";
+$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager $gpu steam gamescope";
 if ($result) {
     die "(X) Failed to install base system...\n(X) Process killed";
 }
-
-print ":: Installing Vulkan drivers...\n";
-$result = `pacstrap /mnt $gpu`;
-die "(X) Failed to install Vulkan drivers...\n(X) Process killed" if $result;
-
-print ":: Installing Valve software...\n";
-$result = system "pacstrap /mnt steam gamescope";
-die "(X) Failed to install Valve software...\n(X) Process killed" if $result;
 
 print ":: Generating filesystem table...\n";
 $result = system "genfstab -U /mnt >> /mnt/etc/fstab";
