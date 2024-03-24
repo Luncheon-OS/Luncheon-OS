@@ -108,10 +108,8 @@ if (fork) {
 } else {
     chroot "/mnt";
 
-    #FIXME: useradd fails, must be using an incorrect switch
-    $result = system "useradd -m -c $name -G wheel -s /bin/bash $username";
+    $result = system "useradd -m -c '$name' -G wheel -s /bin/bash $username";
     die "(X) Failed to create new user...\n(X) Process killed" if $result;
-    #ENDFIXME
 
     require Term::ReadKey;
     Term::ReadKey::ReadMode("noecho");

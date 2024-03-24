@@ -1,7 +1,0 @@
----
-services:
-  main:
-    image: archlinux:latest
-    #FIXME: Complete this file
-volumes:
-  db_data:
