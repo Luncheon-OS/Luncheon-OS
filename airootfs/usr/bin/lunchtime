@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-#FIXME: Install the Term::ReadKey module for password entry
 use strict;
 use warnings;
 
