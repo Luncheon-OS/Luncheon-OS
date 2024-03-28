@@ -11,6 +11,6 @@
 The build process is fairly simple.  
 Ensure you have a machine with Docker and Docker Compose with Root privileges on GNU/Linux or macOS.
 1. Clone this repo.
-2. Change directory into `compose`.
+2. Change directory into `compose` using `cd compose`.
 3. Run `docker compose up` using `sudo` if on GNU/Linux or macOS.
 4. Wait for it to build! When it's done, it will appear in the cloned repo folder/directory.
