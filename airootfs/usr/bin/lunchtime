@@ -26,7 +26,10 @@ print "==> Enter a username for your new user: ";
 my $username = <>;
 chomp $username;
 
-print "(i) For security reasons, your password will be entered near the end.\n";
+system "stty -echo";
+print "==> Enter the password for your new user (invisible): ";
+my $passwd = <>;
+system "stty echo";
 
 print "/_\\ This is your FINAL chance before your data goes to get the milk. PROCEED? [y/n] ";
 $confirm = <>;
@@ -81,7 +84,7 @@ chomp $gpu;
 $gpu = "lib32-mesa" if $gpu eq "1";
 $gpu = "lib32-nvidia-utils" if $gpu eq "2";
 print ":: Installing base system. This will take a bit; installing roughly 757 packages (bundles of code)...\n";
-$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole chromium sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager $gpu steam gamescope";
+$result = system "pacstrap -K -- /mnt base linux linux-firmware grub amd-ucode intel-ucode efibootmgr sudo plasma dolphin konsole firefox sddm flatpak xdg-desktop-portal xdg-desktop-portal-kde ttf-liberation networkmanager $gpu steam gamescope";
 if ($result) {
     die "(X) Failed to install base system...\n(X) Process killed";
 }
@@ -103,14 +106,8 @@ if (fork) {
     $result = system "useradd -m -c '$name' -G wheel -s /bin/bash $username";
     die "(X) Failed to create new user...\n(X) Process killed" if $result;
 
-    require Term::ReadKey;
-    Term::ReadKey::ReadMode("noecho");
-    print "==> Enter new password for $username: ";
-    my $new_password = Term::ReadKey::ReadLine(0);
-    Term::ReadKey::ReadMode("restore");
-    print "\n";
-    $result = system "passwd --stdin $username", "<", \*STDIN, out => "/dev/null", err => "/dev/null";
-    die "(X) Failed to update password...\n(X) Process killed" if $result;
+    $result = system "chpasswd $username:$passwd";
+    die "(X) Failed to set user password...\n(X) Process killed" if $result;
 
     $result = system "systemctl enable sddm";
     die "(X) Failed to enable SDDM...\n(X) Process killed" if $result;

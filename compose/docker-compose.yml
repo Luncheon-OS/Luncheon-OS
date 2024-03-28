@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  losbuild:
+    image: archlinux:latest
+    privileged: true
+    tty: true
+    stdin_open: true
+    command: |- 
+      sh -c "pacman -Syu archiso which --noconfirm;
+      cp /los/compose/mkarchiso $(which mkarchiso);
+      rm -rf /tmp/*;
+      mkarchiso -v -w /tmp -o /los /los"
+    volumes:
+      - ../:/los

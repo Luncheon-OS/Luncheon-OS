@@ -7,19 +7,7 @@
 - Atomic editions are not ready yet because they are not the current main focus. And this OS isn't even done yet.
 > *"Uh, what am I supposed to put here again?"* -me lmao
 ## Building manually
-Ensure that you have an Arch Linux installation (up-to-date) and Podman (recommended, as it is FOSS) or Docker installed with sudo/root access.
-```bash
-git clone https://github.com/Luncheon-OS/Luncheon-OS
-sudo podman pull archlinux:latest
-sudo podman run -it --privileged -v {path to cloned repo}:/los --name los-build archlinux
-```
-Or if you have a preserved container you can run it with these commands:
-```bash
-sudo podman start los-build
-sudo podman attach los-build
-```
-
-Or with Docker:
+Ensure that you have an Arch Linux installation (up-to-date) and Docker with Compose installed with Docker access.
 ```bash
 git clone https://github.com/Luncheon-OS/Luncheon-OS
 sudo docker pull archlinux:latest
@@ -45,5 +33,5 @@ mkarchiso -v -w /tmp -o /los /los
 exit
 ```
 Go to where you cloned the Git repo and the ISO should be there.  
-When you're done, `sudo podman rm los-build` or `sudo docker rm los-build`.  
-You may also preserve this container for future use by instead replacing `exit` with `rm -rf /tmp/*; exit` and not executing the above `[podman/docker] rm` command.
+When you're done, `sudo docker rm los-build`.  
+You may also preserve this container for future use by instead replacing `exit` with `rm -rf /tmp/*; exit` and not executing the above `[docker] rm` command.
