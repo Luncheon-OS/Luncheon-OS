@@ -10,6 +10,9 @@
 ## Building manually
 The build process is VERY simple.  
 Ensure you have a machine with Docker and Docker Compose with Root privileges on GNU/Linux or macOS.
+If you're using GNU/Linux, ensure the Docker socket is enabled.  
+Systemd: `sudo systemctl enable --now docker.socket`  
+Sysv (I've hardly used Sysv so this may be wrong): `sudo service docker.socket start`  
 1. Clone this repo.
 2. Change directory into `compose`.
 3. Run `docker compose up` using `sudo` if on GNU/Linux or macOS.
