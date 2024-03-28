@@ -14,6 +14,6 @@ If you're using GNU/Linux, ensure the Docker socket is enabled.
 Systemd: `sudo systemctl enable --now docker.socket`  
 Sysv (I've hardly used Sysv so this may be wrong): `sudo service docker.socket start`  
 1. Clone this repo.
-2. Change directory into `compose`.
-3. Run `docker compose up` using `sudo` if on GNU/Linux or macOS.
+2. Change directory into `compose` using `cd compose`.
+3. Run `docker compose up` using `sudo` if on GNU/Linux or macOS. (Note if you are using arch and get a daemon error run `sudo systemctl enable --now docker.socket`)
 4. Wait for it to build! When it's done, it will appear in the cloned repo folder/directory.
