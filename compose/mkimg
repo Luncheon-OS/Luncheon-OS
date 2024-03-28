@@ -1,7 +1,0 @@
-#!/usr/bin/perl
-use strict;
-use warnings;
-print "mkimg: initializing build environment\n";
-system "";
-print "mkimg: starting Archiso build\n";
-system ""
