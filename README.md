@@ -8,7 +8,7 @@
 > *"Uh, what am I supposed to put here again?"* -me lmao
 
 ## Building manually
-The build process is fairly simple.  
+The build process is VERY simple.  
 Ensure you have a machine with Docker and Docker Compose with Root privileges on GNU/Linux or macOS.
 1. Clone this repo.
 2. Change directory into `compose`.
